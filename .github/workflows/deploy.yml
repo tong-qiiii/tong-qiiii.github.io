@@ -18,7 +18,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          submodules: true      # 拉取主题等子模块
+          submodules: true
           fetch-depth: 0
 
       - name: Debug list root files
@@ -36,8 +36,7 @@ jobs:
 
       - name: Build site
         run: |
-          # 明确指定可能存在的配置文件（支持 hugo.yaml 或 config.yaml）
-          hugo --minify --cleanDestinationDir --config "hugo.yaml,config.yaml" 
+          hugo --minify --cleanDestinationDir --config hugo.yaml,config.yaml
 
       - name: Show generated public files (for debug)
         run: |
@@ -45,7 +44,7 @@ jobs:
           if [ -d public ]; then ls -la public | sed -n '1,200p'; else echo "public/ not found"; fi
 
       - name: Deploy to gh-pages
-        uses: peaceiris/actions-gh-pages@v5
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
