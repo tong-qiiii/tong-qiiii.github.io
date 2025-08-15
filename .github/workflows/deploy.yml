@@ -1,23 +1,32 @@
-name: Deploy Hugo site to Pages
+name: Deploy Hugo site to GitHub Pages
 
 on:
   push:
     branches:
-      - main  # 监听 main 分支推送
+      - main
 
 permissions:
-  contents: write  # 允许修改 gh-pages 分支
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout source
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          submodules: true  # 拉取 submodule（Stack 主题）
+          submodules: true      # 拉取主题等子模块
           fetch-depth: 0
+
+      - name: Debug list root files
+        run: |
+          echo "== repo root =="
+          ls -la
+          echo "== config candidates =="
+          ls -la hugo.yaml config.yaml config.yml config.toml config.json || true
 
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v3
@@ -26,11 +35,19 @@ jobs:
           extended: true
 
       - name: Build site
-        run: hugo --minify --cleanDestinationDir --config hugo.yaml
+        run: |
+          # 明确指定可能存在的配置文件（支持 hugo.yaml 或 config.yaml）
+          hugo --minify --cleanDestinationDir --config "hugo.yaml,config.yaml" 
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Show generated public files (for debug)
+        run: |
+          echo "== public contents =="
+          if [ -d public ]; then ls -la public | sed -n '1,200p'; else echo "public/ not found"; fi
+
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v5
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./public
           publish_branch: gh-pages
+          publish_dir: ./public
+          allow_empty_commit: true
