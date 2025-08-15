@@ -6,7 +6,7 @@ on:
       - main
 
 permissions:
-  contents: write
+  contents: read
   pages: write
   id-token: write
 
@@ -43,10 +43,10 @@ jobs:
           echo "== public contents =="
           if [ -d public ]; then ls -la public | sed -n '1,200p'; else echo "public/ not found"; fi
 
-      - name: Deploy to gh-pages
+      - name: Deploy to gh-pages using GITHUB_TOKEN
         uses: peaceiris/actions-gh-pages@v4
         with:
-          deploy_key: ${{ secrets.DEPLOY_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
           publish_dir: ./public
           allow_empty_commit: true
