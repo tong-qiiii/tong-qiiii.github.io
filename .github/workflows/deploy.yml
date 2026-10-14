@@ -1,52 +1,47 @@
-name: Deploy Hugo site to GitHub Pages
-
+name: Deploy blog to GitHub Pages
 on:
   push:
-    branches:
-      - main
-
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
 permissions:
   contents: read
-  pages: write
-  id-token: write
-
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
+      - name: Checkout blog and theme
         uses: actions/checkout@v4
         with:
-          submodules: true
+          submodules: recursive
           fetch-depth: 0
-
-      - name: Debug list root files
-        run: |
-          echo "== repo root =="
-          ls -la
-          echo "== config candidates =="
-          ls -la hugo.yaml config.yaml config.yml config.toml config.json || true
-
-      - name: Setup Hugo
+      - name: Setup Hugo extended
         uses: peaceiris/actions-hugo@v3
         with:
-          hugo-version: 'latest'
+          hugo-version: '0.148.2'
           extended: true
-
-      - name: Build site
-        run: |
-          hugo --minify --cleanDestinationDir --config hugo.yaml,config.yaml
-
-      - name: Show generated public files (for debug)
-        run: |
-          echo "== public contents =="
-          if [ -d public ]; then ls -la public | sed -n '1,200p'; else echo "public/ not found"; fi
-
-      - name: Deploy to gh-pages using Personal Access Token
-        uses: peaceiris/actions-gh-pages@v4
+      - name: Build blog
+        run: hugo --minify --cleanDestinationDir --config config.yaml
+      - name: Upload Pages artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v4
         with:
-          personal_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          publish_branch: gh-pages
-          publish_dir: ./public
-          allow_empty_commit: true
+          path: public
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
