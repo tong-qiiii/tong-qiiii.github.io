@@ -1,0 +1,30 @@
+{{ define "main" }}
+  {{ $pages := where .Site.RegularPages "Type" "in" .Site.Params.mainSections }}
+  {{ $filtered := where $pages "Params.hidden" "!=" true }}
+  {{ $pag := .Paginate $filtered }}
+  {{ if eq $pag.PageNumber 1 }}
+  <section class="notebook-intro" aria-labelledby="intro-title">
+    <div class="intro-label"><span class="status-dot"></span> TONGQI'S NOTEBOOK <span class="intro-number">01 / 持续记录</span></div>
+    <h1 id="intro-title">把思考写下来，<br><span>让知识有迹可循。</span></h1>
+    <p>这里记录 ICPC 题解、算法思考和学习笔记。<br class="desktop-break">从一次推导、一段代码开始，慢慢积累。</p>
+    <div class="intro-actions">
+      <a class="intro-primary" href="{{ "solutions/" | relURL }}">阅读题解 <span aria-hidden="true">↗</span></a>
+      <a class="intro-secondary" href="{{ "resources/" | relURL }}">浏览学习资料 <span aria-hidden="true">→</span></a>
+    </div>
+    <div class="intro-foot"><span>ALGORITHM · CODE · NOTES</span><span>{{ len $filtered }} 篇记录</span></div>
+  </section>
+  <nav class="notebook-paths" aria-label="内容分类">
+    <a href="{{ "solutions/" | relURL }}"><span class="path-index">01</span><div><strong>ICPC 题解</strong><span>思路 · 证明 · 实现</span></div><span aria-hidden="true">↗</span></a>
+    <a href="{{ "notes/" | relURL }}"><span class="path-index">02</span><div><strong>学习笔记</strong><span>理解 · 整理 · 回顾</span></div><span aria-hidden="true">↗</span></a>
+  </nav>
+  {{ end }}
+  <div class="notebook-section-title"><h2>最近记录</h2><a href="{{ "archives/" | relURL }}">全部归档 →</a></div>
+  <section class="article-list">
+    {{ range $pag.Pages }}{{ partial "article-list/default" . }}{{ end }}
+  </section>
+  {{ partial "pagination.html" . }}
+  {{ partial "footer/footer" . }}
+{{ end }}
+{{ define "right-sidebar" }}
+  {{ partial "sidebar/right.html" (dict "Context" . "Scope" "homepage") }}
+{{ end }}
