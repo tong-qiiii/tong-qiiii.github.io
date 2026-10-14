@@ -1,0 +1,15 @@
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const toggle = document.getElementById('dark-mode-toggle');
+  if (!toggle) return;
+  toggle.setAttribute('role', 'button');
+  toggle.setAttribute('tabindex', '0');
+  toggle.setAttribute('aria-label', '切换浅色与深色模式');
+  toggle.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      toggle.click();
+    }
+  });
+});
+</script>
