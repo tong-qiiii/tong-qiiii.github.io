@@ -3,7 +3,7 @@ languageCode: zh-cn
 defaultContentLanguage: zh-cn
 hasCJKLanguage: true
 theme: hugo-theme-stack
-title: "tongqi · 学习记录"
+title: "tongqi"
 copyright: tongqi
 enableRobotsTXT: true
 pagination:
@@ -21,12 +21,12 @@ params:
   favicon: /favicon.svg
   footer:
     since: 2025
-    customText: "记录思考，慢慢积累。"
+    customText: ""
   dateFormat:
     published: "2006-01-02"
     lastUpdated: "2006-01-02"
   sidebar:
-    subtitle: "ICPC 题解 / 学习笔记 / 资料收藏"
+    subtitle: "写题，读书，做笔记。"
     avatar:
       enabled: false
   article:
